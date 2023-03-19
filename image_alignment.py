@@ -1,106 +1,124 @@
 import cv2 
 import numpy as np
-from matplotlib import pyplot as plt
 
-'''
-只需要 call alignment(images, standard, depth)
-images : list of images
-standard : index of standard image, 所有 images 都會向 standard image 對齊
-depth : 決定縮放的大小, default = 6。EX : depth = 5 最多縮小 5 次
-'''
-def get_binary_image(image, bias = 4):
-    sum_image = np.sum(image, axis = 2)
-    binary_threshold = np.percentile(sum_image, 50)
-    mask = (~cv2.inRange(sum_image, binary_threshold-bias, binary_threshold+bias))/255
-    return mask, sum_image >= binary_threshold
+# call this function
+# input : list of images
+# output : list of aligned images
+def alignment(images, level = 8):
+    aligned_images = [images[0]]
+    binary_images = get_binary_images(images)
+    for i in range(1, len(binary_images)):
+        dx, dy = align_two(binary_images[i-1], binary_images[i], level)
+        #print("dx dy are ", dx, dy)
+        binary_images[i] = shift_image(binary_images[i], dx, dy)
+        aligned_images.append(shift_image(images[i], dx, dy))
+    return aligned_images
 
-def shrink_image(image):
-    width, height, _ = np.shape(image)
-    return  cv2.resize(image, (int(height/2), int(width/2)), interpolation=cv2.INTER_LINEAR)
+def get_grayscale_image(image):
+    new_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    pixel_list = []
+    median = 0
+    for i in range(len(new_image)):
+        pixel_list += list(new_image[i])
+    # find median as threshold
+    list.sort(pixel_list)
+    l = len(pixel_list)
+    if l%2 == 0:
+        median = (int(pixel_list[l//2])+int(pixel_list[l//2+1]))/2
+    else :
+        median = pixel_list[l//2]
+    _, grayscale_image = cv2.threshold(new_image, median, 255, 0)
 
-def count_diff_with_mask(image1, mask1, image2, mask2):
-    return np.sum(np.logical_xor(np.logical_and(image1, mask1), np.logical_and(image2, mask2)))
+    # compute Exclusion bitmap, ignore noise near the median(near mdeian -> 0, else -> 255) 
+    mask = cv2.inRange(image, median-10, median+10)
+    # replace 255 with 1
+    mask = transform_to_binary(~mask)
+    grayscale_image = transform_to_binary(grayscale_image)
+    return mask, grayscale_image
 
-def count_diff(image1, image2):
-    return np.sum(np.logical_xor(image1, image2))
+def transform_to_binary(image):
+    for i in range(len(image)):
+        for j in range(len(image[i])):
+            image[i][j] = 1 if image[i][j] == 255 else 0
+    return image 
+    
+def get_binary_images(images):
+    binary_images = []
+    for i in range(len(images)):
+        mask, grayscale_image = get_grayscale_image(images[i])
+        binary_image = BitAND(grayscale_image, mask)
+        binary_images.append(binary_image)
+    return binary_images
 
 def shift_image(image, dx, dy):
     shift_matrix = np.float32([[1, 0, dx], [0, 1, dy]])
-    width, height, _ = np.shape(image)
-    new_image = cv2.warpAffine(image, shift_matrix, (height, width))
+    col, row = np.shape(image)[0], np.shape(image)[1]
+    new_image = cv2.warpAffine(image, shift_matrix, (row, col))
     return new_image
 
-def alignment(images, standard = 0, depth = 6):
-    standard_shrink = [images[standard]]
-    temp_mask, temp_binary = get_binary_image(standard_shrink[-1])
-    standard_binary = [temp_binary]
-    standard_mask = [temp_mask]
-    images_output = []
-    # compute all shrinked, mask, binary image of standard image
-    for i in range(depth):
-        standard_shrink.append(shrink_image(standard_shrink[-1]))
-        temp_mask, temp_binary = get_binary_image(standard_shrink[-1])
-        standard_binary.append(temp_binary)
-        standard_mask.append(temp_mask)
-        
-    neighbors = np.array([[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, -1], [-1, 1]])
-    for index in range(len(images)):
-        image_shrink = [images[index]]
-        for i in range(depth):
-            image_shrink.append(shrink_image(image_shrink[-1]))
+def shrink_images(image):
+    col, row = np.shape(image)[0], np.shape(image)[1]
+    new_image = cv2.resize(image, (int(row/2), int(col/2)), interpolation=cv2.INTER_LINEAR)
+    return new_image
 
-        best_shift = np.array([0, 0])
-        for level in range(depth-1, -1, -1):
-            #print("in depth =",level)
-            best_shift = best_shift*2
-            min_diff = np.shape(images[index])[0]*np.shape(images[index])[1]
-            shift = np.array([0, 0])
-            for next in neighbors:
-                shifted_image = shift_image(image_shrink[level], best_shift[0]+next[0], best_shift[1]+next[1])
-                mask, binary = get_binary_image(shifted_image)
-                diff = count_diff_with_mask(standard_binary[level], standard_mask[level], binary, mask)
-                if diff < min_diff:
-                    min_diff = diff
-                    shift = np.array(next)
-                #print(diff, min_diff, shift)
-            best_shift = best_shift + shift
-        
-        #print("image", index, "best_shift =",best_shift)
-        #print("------------------------------")
-        images_output.append(shift_image(images[index], best_shift[0], best_shift[1]))
+def BitXOR(image1, image2):
+    bit_image = image1.copy() 
+    for i in range(len(image1)):
+        for j in range(len(image1[i])):
+            bit_image[i][j] = image1[i][j]^image2[i][j]
+    return bit_image
 
-    return images_output
+def BitAND(image1, image2):
+    bit_image = image1.copy() 
+    for i in range(len(image1)):
+        for j in range(len(image1[i])):
+            bit_image[i][j] = image1[i][j]&image2[i][j]
+    return bit_image
 
+def count_diff(image1, image2):
+    diff_image = BitXOR(image1, image2)
+    sum = 0
+    for i in range(len(diff_image)):
+        for j in range(len(diff_image[i])):
+            sum += diff_image[i][j]
+    return sum
+
+def align_two(image1, image2, level):
+    dx = dy = 0
+    if level > 0 :
+        next_image1 = shrink_images(image1)
+        next_image2 = shrink_images(image2)
+        dx, dy = align_two(next_image1, next_image2, level-1)
+        dx *= 2
+        dy *= 2
+
+    min_diff = 10**8
+    dir = [0, 0]
+    for i in [1, -1, 0]:
+        for j in [1, -1, 0]:
+            shifted_image2 = shift_image(image2, dx+i, dy+j)
+            diff = count_diff(image1, shifted_image2)
+            if diff < min_diff :
+                min_diff = diff
+                dir[0] = i
+                dir[1] = j
+                #print(min_diff, dx + dir[0], dy + dir[1])
+    #print(min_diff, dx + dir[0], dy + dir[1])
+    #print("------------")
+    return dx + dir[0], dy + dir[1] 
+
+# test
 def test():
     images = []
-    images.append(cv2.imread("./My_Images/image0.jpg"))
-    images.append(cv2.imread("./My_Images/image1.jpg"))
-    images.append(cv2.imread("./My_Images/image2.jpg"))
-    images.append(cv2.imread("./My_Images/image3.jpg"))
-    images.append(cv2.imread("./My_Images/image4.jpg"))
-    images.append(cv2.imread("./My_Images/image5.jpg"))
-    images.append(cv2.imread("./My_Images/image6.jpg"))
-    '''images.append(cv2.imread("./Memorial_SourceImages/memorial0061.png"))
-    images.append(cv2.imread("./Memorial_SourceImages/memorial0062.png"))
-    images.append(cv2.imread("./Memorial_SourceImages/memorial0063.png"))
-    images.append(cv2.imread("./Memorial_SourceImages/memorial0064.png"))
     images.append(cv2.imread("./Memorial_SourceImages/memorial0065.png"))
-    images.append(cv2.imread("./Memorial_SourceImages/memorial0066.png"))
-    images.append(cv2.imread("./Memorial_SourceImages/memorial0067.png"))
-    images.append(cv2.imread("./Memorial_SourceImages/memorial0068.png"))
     images.append(cv2.imread("./Memorial_SourceImages/memorial0069.png"))
     images.append(cv2.imread("./Memorial_SourceImages/memorial0070.png"))
     images.append(cv2.imread("./Memorial_SourceImages/memorial0071.png"))
     images.append(cv2.imread("./Memorial_SourceImages/memorial0072.png"))
     images.append(cv2.imread("./Memorial_SourceImages/memorial0073.png"))
-    images.append(cv2.imread("./Memorial_SourceImages/memorial0074.png"))
-    images.append(cv2.imread("./Memorial_SourceImages/memorial0075.png"))
-    images.append(cv2.imread("./Memorial_SourceImages/memorial0076.png"))'''
-    output = alignment(images, int(len(images)/2))
-
-    for i, img in enumerate(output):
-        img = img[:,:,::-1]
-        plt.imshow(img)
-        plt.show()
-
+    aligned_images = alignment(images)
+    for i in [0, 3, 4, 5]:
+        cv2.imshow("aligned_image"+str(i), aligned_images[i])
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 test()
