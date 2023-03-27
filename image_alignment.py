@@ -73,14 +73,14 @@ def alignment(images, standard = 0, depth = 6):
 
 def test():
     images = []
-    images.append(cv2.imread("./My_Images/image0.jpg"))
+    '''images.append(cv2.imread("./My_Images/image0.jpg"))
     images.append(cv2.imread("./My_Images/image1.jpg"))
     images.append(cv2.imread("./My_Images/image2.jpg"))
     images.append(cv2.imread("./My_Images/image3.jpg"))
     images.append(cv2.imread("./My_Images/image4.jpg"))
     images.append(cv2.imread("./My_Images/image5.jpg"))
-    images.append(cv2.imread("./My_Images/image6.jpg"))
-    '''images.append(cv2.imread("./Memorial_SourceImages/memorial0061.png"))
+    images.append(cv2.imread("./My_Images/image6.jpg"))'''
+    images.append(cv2.imread("./Memorial_SourceImages/memorial0061.png"))
     images.append(cv2.imread("./Memorial_SourceImages/memorial0062.png"))
     images.append(cv2.imread("./Memorial_SourceImages/memorial0063.png"))
     images.append(cv2.imread("./Memorial_SourceImages/memorial0064.png"))
@@ -95,7 +95,7 @@ def test():
     images.append(cv2.imread("./Memorial_SourceImages/memorial0073.png"))
     images.append(cv2.imread("./Memorial_SourceImages/memorial0074.png"))
     images.append(cv2.imread("./Memorial_SourceImages/memorial0075.png"))
-    images.append(cv2.imread("./Memorial_SourceImages/memorial0076.png"))'''
+    images.append(cv2.imread("./Memorial_SourceImages/memorial0076.png"))
     output = alignment(images, int(len(images)/2))
 
     for i, img in enumerate(output):
@@ -103,4 +103,4 @@ def test():
         plt.imshow(img)
         plt.show()
 
-test()
+#test()

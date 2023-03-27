@@ -1,0 +1,2 @@
+./library/DSC00721.JPG ./library/DSC00722.JPG ./library/DSC00723.JPG ./library/DSC00724.JPG ./library/DSC00725.JPG ./library/DSC00726.JPG ./library/DSC00727.JPG ./library/DSC00728.JPG ./library/DSC00729.JPG
+8 4 2 1 0.5 0.25 0.125 0.067 0.033

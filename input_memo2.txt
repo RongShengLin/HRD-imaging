@@ -1,0 +1,2 @@
+./exposures/img01.jpg ./exposures/img02.jpg ./exposures/img03.jpg ./exposures/img04.jpg ./exposures/img05.jpg ./exposures/img06.jpg ./exposures/img07.jpg ./exposures/img08.jpg ./exposures/img09.jpg ./exposures/img10.jpg ./exposures/img11.jpg ./exposures/img12.jpg ./exposures/img13.jpg
+0.07692307692307693 0.1 0.25 0.3125 1.0 1.25 3.003003003003003 4.0 59.98800239952009 80.0 320.0 400.0 1000.0
