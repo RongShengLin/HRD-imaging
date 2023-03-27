@@ -17,7 +17,7 @@ def gamma_correction(pixel, type):
         if pixel <= 0.018 : 
             return 4.5*pixel
         else:
-            return 1.099*pixel**0.45-0.099
+            return 1.099*pixel**0.8-0.099
     else :
         if pixel <= 0.0031308:
             return pixel * 12.92
