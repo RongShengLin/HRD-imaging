@@ -74,19 +74,6 @@ def alignment(images, standard = 0, depth = 6):
 def test():
     shifts = np.array([[]])
     images = []
-<<<<<<< HEAD
-=======
-    num = 27
-    #path = "./My_Images/image"
-    #path = "./Memorial_SourceImages/memorial00"
-    path = "./Photo1/image"
-    #path = "./exposures/img"
-    file_type = ".jpg"
-    #file_type = ".png"
-    for i in range(num):
-        images.append(cv2.imread(path + str(i+1) + file_type))
-    print(len(images))
->>>>>>> 99aeb3aba3adc273b6e3d0a4bcf01f9366ebbde1
     '''images.append(cv2.imread("./My_Images/image0.jpg"))
     images.append(cv2.imread("./My_Images/image1.jpg"))
     images.append(cv2.imread("./My_Images/image2.jpg"))
@@ -94,11 +81,7 @@ def test():
     images.append(cv2.imread("./My_Images/image4.jpg"))
     images.append(cv2.imread("./My_Images/image5.jpg"))
     images.append(cv2.imread("./My_Images/image6.jpg"))'''
-<<<<<<< HEAD
     images.append(cv2.imread("./Memorial_SourceImages/memorial0061.png"))
-=======
-    '''images.append(cv2.imread("./Memorial_SourceImages/memorial0061.png"))
->>>>>>> 99aeb3aba3adc273b6e3d0a4bcf01f9366ebbde1
     images.append(cv2.imread("./Memorial_SourceImages/memorial0062.png"))
     images.append(cv2.imread("./Memorial_SourceImages/memorial0063.png"))
     images.append(cv2.imread("./Memorial_SourceImages/memorial0064.png"))
@@ -113,27 +96,7 @@ def test():
     images.append(cv2.imread("./Memorial_SourceImages/memorial0073.png"))
     images.append(cv2.imread("./Memorial_SourceImages/memorial0074.png"))
     images.append(cv2.imread("./Memorial_SourceImages/memorial0075.png"))
-<<<<<<< HEAD
     images.append(cv2.imread("./Memorial_SourceImages/memorial0076.png"))
-=======
-    images.append(cv2.imread("./Memorial_SourceImages/memorial0076.png"))'''
-    '''images.append(cv2.imread("./exposures/img01.jpg"))
-    images.append(cv2.imread("./exposures/img02.jpg"))
-    images.append(cv2.imread("./exposures/img03.jpg"))
-    images[-1] = shift_image(images[-1], -5, 5)
-    images.append(cv2.imread("./exposures/img04.jpg"))
-    images.append(cv2.imread("./exposures/img05.jpg"))
-    images.append(cv2.imread("./exposures/img06.jpg"))
-    images.append(cv2.imread("./exposures/img07.jpg"))
-    images.append(cv2.imread("./exposures/img08.jpg"))
-    images.append(cv2.imread("./exposures/img09.jpg"))
-    images.append(cv2.imread("./exposures/img10.jpg"))
-    images.append(cv2.imread("./exposures/img11.jpg"))
-    images[-1] = shift_image(images[-1], -5, 5)
-    images.append(cv2.imread("./exposures/img12.jpg"))
-    images[-1] = shift_image(images[-1], -5, -5)
-    images.append(cv2.imread("./exposures/img13.jpg"))'''
->>>>>>> 99aeb3aba3adc273b6e3d0a4bcf01f9366ebbde1
     output = alignment(images, int(len(images)/2))
 
     '''for i, img in enumerate(output):

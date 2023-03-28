@@ -37,25 +37,25 @@ def get_sol(z, i):
     return sol[i][z]
 
 #open file
-#Note:It is just a sample, and should be more user-friendl
 time = []
 imgs = []
 p = 0
 try:
     while True:
         file = input().split()
-        imgs.append(cv2.imread("./Photo1/" + file[0]))
+        imgs.append(cv2.imread(file[0]))
         time.append(1/float(file[1]))
         p += 1
 except EOFError:
     pass
 time_log = np.log(time)
 print(time_log)
+
+#Alignment
 imgs = Align.alignment(np.float32(imgs), int(len(imgs)/2))
 imgs = np.array(imgs)
 imgs = imgs.astype(np.uint8)
-
-#TODO Image alignment(can pass)
+print("Alignment complete")
 
 #sampling 50 pixels
 w, h, _ = imgs[0].shape
@@ -95,7 +95,9 @@ for color in range(3):
     sol.append(x)
     for n_ in range(256):
         plt.plot(x[n_], n_, 'o', label='solution', markersize=5)
-    plt.show()
+    #plt.show()
+    plt.savefig("Curve_{:d}.png".format(color))
+    plt.clf()
 sol = np.array(sol)
 
 del A
@@ -130,7 +132,7 @@ for i in range(3):
 sum_E = np.sum(w_z * (g_z - time), axis=0)  #(w, h, color)
 hdr_img[:, :, :] = np.exp(sum_E / sum_w)'''
 
-cv2.imwrite("test.hdr", hdr_img.astype(np.float32))
+cv2.imwrite("HDR_img.hdr", hdr_img.astype(np.float32))
 print("Write HDR complete")
 
 del w_z
@@ -161,8 +163,9 @@ gc.collect()
 for k in range(3):
     Ldr_img[:, : , k] = Ldr_img[:, :, k] * L[:, :] * 225
 Ldr_img = np.clip(Ldr_img, 0, 255)
-cv2.imwrite("Ldr.jpg", Ldr_img.astype(np.uint8))
-print("LDR global complete")
+cv2.imwrite("Ldr_global.jpg", Ldr_img.astype(np.uint8))
+print("tonemapping photographic global complete")
+
 #for test
 '''test = cv2.imread("./test.jpg")
 test_img_B = np.zeros((w, h, 3))
@@ -201,9 +204,15 @@ Ldr_img = np.clip(Ldr_img, 0, 255)
 Ldr_img_B[:, :, 0] = Ldr_img[:, :, 0]
 Ldr_img_G[:, :, 1] = Ldr_img[:, :, 1]
 Ldr_img_R[:, :, 2] = Ldr_img[:, :, 2]
-#print(Ldr_img)
+
 cv2.imwrite("Ldr_local.jpg", Ldr_img)
-cv2.imwrite("Ldr_B.jpg", Ldr_img_B.astype(np.uint8))
+'''cv2.imwrite("Ldr_B.jpg", Ldr_img_B.astype(np.uint8))
 cv2.imwrite("Ldr_G.jpg", Ldr_img_G.astype(np.uint8))
-cv2.imwrite("Ldr_R.jpg", Ldr_img_R.astype(np.uint8))
-print("LDR local complete")
+cv2.imwrite("Ldr_R.jpg", Ldr_img_R.astype(np.uint8))'''
+print("tonemapping photographic local complete")
+
+#adaptive logarithmic mapping
+ldr_img_alm = ALM.Adaptive_Logarithmic_Mapping(hdr_img.astype(np.float32))
+ldr_img_alm = np.clip(ldr_img_alm * 255, 0, 255).astype('uint8')
+cv2.imwrite("Ldr_log.jpg", ldr_img_alm)
+print("tonemapping Logarithmic complete")

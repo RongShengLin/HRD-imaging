@@ -27,7 +27,7 @@ def gamma_correction(pixel, type):
 def Adaptive_Logarithmic_Mapping(HDR_image, b = 0.85, L_dmax = 100, gamma_correction_type = 1):
     width, height, _ = HDR_image.shape
     CIE_image = cv2.cvtColor(HDR_image, cv2.COLOR_BGR2XYZ)
-
+    #CIE_image = HDR_image
     L_avg = np.sum(CIE_image[:,:,1])/(width*height)
     _, L_wmax, _, _ = cv2.minMaxLoc(CIE_image[:,:,1])
 
