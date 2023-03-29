@@ -8,7 +8,7 @@
 其中第一項為照片的路徑(絕對路徑或相對於hw1.py的路徑)  
 第二項為曝光時間的倒數  
 如下圖:  
-![](https://i.imgur.com/ShdxOpr.png)
+![](https://i.imgur.com/ShdxOpr.png)  
 接下來執行  
 ```shell
 python3 hw1.py < list.txt
