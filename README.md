@@ -1,4 +1,6 @@
 # README
+## 主題
+本次實作HDR演算法，通過將多張不同曝光時間的LDR影像合成為品質較佳的HDR影像，並以tone mapping技術將其再轉換為更加清晰的LDR圖片
 ## 執行
 首先需要建立一個input file的list  
 格式如下:  
