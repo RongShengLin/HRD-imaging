@@ -16,7 +16,7 @@ import sys
 parser = argparse.ArgumentParser()
 parser.add_argument("input", help = "input file")
 parser.add_argument("-o", "--output", help = "output directory", default="./result")
-parser.add_argument("-c", "--curve", help= "show curve", type=bool, default=False)
+parser.add_argument("-c", "--curve", help= "show curve", action=argparse.BooleanOptionalAction, default=False)
 
 args = parser.parse_args()
 input_filename, output_dirname, showCurve = args.input, args.output, args.curve
