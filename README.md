@@ -11,7 +11,7 @@
 ./example1.file time1  
 ./example2.file time2  
 ...  
-其中第一項為照片的路徑(絕對路徑或相對於hw1.py的路徑)  
+其中第一項為照片的路徑(絕對路徑或相對執行時的路徑)  
 第二項為曝光時間的倒數  
 如下圖:  
 ![](https://i.imgur.com/ShdxOpr.png)  
